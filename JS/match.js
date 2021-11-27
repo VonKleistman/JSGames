@@ -19,11 +19,14 @@ let cardsMatched = [];
 //Number of points our player has gotten
 let points = 0;
 
+//Var to change the number of cards generated. *NOTE* More card images will need to be include for more than 8 cards
+let numOfCards = 8;
+
 //function for populating the cards
 function populateCards()
 {
     //create card game elements
-    for(i = 0; i < 8; i++) //loop up to the number of cards we want in the match game
+    for(i = 0; i < numOfCards; i++) //loop up to the number of cards we want in the match game
     {
         let tempcard = document.createElement("img"); //creates a div element that we can place on the page
         tempcard.setAttribute("id", "matchcard" + i); //sets the id of the created div element
@@ -35,10 +38,17 @@ function populateCards()
     //addEventListener fires the function immediately, to prevent our cards from flipping, we add and additional function that calls flipCard
 
     //generate array of card numbers to assist with card generation
-    let cardnumarray = [1, 2, 3, 4, 1, 2, 3, 4];
+    let cardnumarray = [];
+
+    for(i = 0; i < numOfCards/2; i++)
+    {
+        cardnumarray.push(i + 1);
+        cardnumarray.push(i + 1);
+        //*NOTE* We push 2 of the same number into the array to allow 2 copies of each card to be generated
+    }
 
     //generate cards with only 2 copies of each "front" image total
-    for(i = 0; i < 8; i++) //same as the loop above
+    for(i = 0; i < numOfCards; i++) //same as the loop above
     {
         let cardImageIndex = Math.ceil(Math.random() * cardnumarray.length - 1); //get an image number to add to the card
         let cardImgs = new cardImages; //create a card object to hold relevant data
@@ -74,15 +84,12 @@ function checkForMatch()
         }
         else
         {
-            for(i = 0; i < cardsChosen.length; i++)
-            {
-                cardsChosen[i].setAttribute("src", myCardArray[0].cardInfo.back);
-            }
-            cardsChosen.splice(0, 2);
+            setTimeout(unFlipCards, 780);
+            setTimeout(() => {cardsChosen.splice(0,2)}, 800);
         }
         if(cardsMatched.length == myCardArray.length)
         {
-            resetBoard();
+            setTimeout(resetBoard, 700);
         }
     }
 }
@@ -96,7 +103,16 @@ function flipCard(idToFlip)
         let idNum = elementToFlip.getAttribute("id").replace("matchcard", "");
         elementToFlip.setAttribute("src", myCardArray[idNum].cardInfo.front);
         cardsChosen.push(elementToFlip);
-        setTimeout(checkForMatch, 600);
+        checkForMatch();
+    }
+}
+
+//function to flip the cards back over in the event they are not a match
+function unFlipCards()
+{
+    for(i = 0; i < cardsChosen.length; i++)
+    {
+        cardsChosen[i].setAttribute("src", myCardArray[0].cardInfo.back);
     }
 }
 
@@ -104,7 +120,7 @@ function flipCard(idToFlip)
 function resetBoard()
 {
     clearGameInfo()
-    setTimeout(clearboard(), 600);
+    clearboard();
     populateCards();
 }
 
